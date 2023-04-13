@@ -1,5 +1,9 @@
 class ToonModel {
-  late final String title, thumb, id;
+  final String title, thumb, url;
+  final List<dynamic> genre;
   ToonModel.fromJson(
-      {required var this.title, required var this.thumb, required var this.id});
+      {required var this.title,
+      required var this.thumb,
+      required var this.url,
+      required var this.genre});
 }
