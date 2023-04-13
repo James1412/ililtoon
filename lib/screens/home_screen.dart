@@ -8,12 +8,13 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Todays Toon",
+          "Recent Toons",
           style: Theme.of(context).textTheme.titleLarge,
         ),
         backgroundColor: Colors.white,
         elevation: 0.5,
       ),
+      body: const Text('hi'),
     );
   }
 }
