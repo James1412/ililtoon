@@ -3,13 +3,15 @@ import 'package:html/dom.dart' as dom;
 import 'package:webtoon_second_try/models/webtoon_model.dart';
 
 class ApiServer {
-  static int ililcode = 65;
+  static int ililcode = 68;
   static String url =
-      'https://www.11toon$ililcode.com/bbs/board.php?bo_table=toon_c&type=upd';
+      'https://www.11toon$ililcode.com/bbs/board.php?bo_table=toon_c&type=upd&tablename=최신만화';
+  static int pageNumber = 1;
 
-  static Future<List> getToons() async {
+  static Future<List> getToons({required startPage, required endPage}) async {
     List<dynamic> toons = [];
-    for (int page = 1; page < 21; page++) {
+    for (int page = startPage; page <= endPage; page++) {
+      // ililcode changes every few weeks or months
       // avoid changed ililcode
       int maxAttempts = 50;
       int attempts = 0;
@@ -36,11 +38,9 @@ class ApiServer {
           // 아예 접속이 안됨
           ililcode++;
           attempts++;
-          url =
-              'https://www.11toon$ililcode.com/bbs/board.php?bo_table=toon_c&type=upd';
+          url = url;
         }
       }
-
       final uri = Uri.parse('$url&page=$page');
       final response = await http.get(uri);
       dom.Document html = dom.Document.html(response.body);
@@ -64,8 +64,6 @@ class ApiServer {
           .map((e) => "https://www.11toon69.com/${e.attributes['href']}")
           .toList();
 
-      // this thing prints <>genrename<><> something like this, so
-      // needs to remove those other than the genrename in korean
       final roughGenre = html
           .querySelectorAll('a > div.homelist-genre')
           .map((e) => e.innerHtml.trim())
@@ -97,7 +95,7 @@ class ApiServer {
         throw Error();
       }
     }
-    print(toons);
+
     return toons;
   }
 }
