@@ -4,8 +4,8 @@ import 'package:webtoon_second_try/screens/home_screen.dart';
 import 'package:webtoon_second_try/services/api_service.dart';
 
 void main() {
+  ApiServer.getToons();
   runApp(const App());
-  ApiServer().getToons();
 }
 
 class App extends StatelessWidget {

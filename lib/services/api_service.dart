@@ -3,12 +3,44 @@ import 'package:html/dom.dart' as dom;
 import 'package:webtoon_second_try/models/webtoon_model.dart';
 
 class ApiServer {
-  String url =
-      'https://www.11toon69.com/bbs/board.php?bo_table=toon_c&type=upd';
+  static int ililcode = 65;
+  static String url =
+      'https://www.11toon$ililcode.com/bbs/board.php?bo_table=toon_c&type=upd';
 
-  Future<List> getToons() async {
+  static Future<List> getToons() async {
     List<dynamic> toons = [];
     for (int page = 1; page < 21; page++) {
+      // avoid changed ililcode
+      int maxAttempts = 50;
+      int attempts = 0;
+      bool isWebsiteWorking = false;
+      while (!isWebsiteWorking && attempts < maxAttempts) {
+        try {
+          final uri = Uri.parse('$url&page=$page');
+          final response = await http.get(uri);
+          dom.Document html = dom.Document.html(response.body);
+          // 작동은 함
+          final titles = html
+              .querySelectorAll(' a > div.homelist-title > span')
+              .map((e) => e.innerHtml.trim())
+              .toList();
+          if (titles.isEmpty) {
+            // 근데 내가 원하던 사이트가 아님
+            ililcode++;
+            throw Exception('Titles list is empty');
+          } else {
+            // 내가 원하던 사이트임
+            isWebsiteWorking = true;
+          }
+        } catch (e) {
+          // 아예 접속이 안됨
+          ililcode++;
+          attempts++;
+          url =
+              'https://www.11toon$ililcode.com/bbs/board.php?bo_table=toon_c&type=upd';
+        }
+      }
+
       final uri = Uri.parse('$url&page=$page');
       final response = await http.get(uri);
       dom.Document html = dom.Document.html(response.body);
@@ -61,9 +93,11 @@ class ApiServer {
           );
         }
       } else {
+        ililcode += 1;
         throw Error();
       }
     }
+    print(toons);
     return toons;
   }
 }
